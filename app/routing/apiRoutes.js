@@ -12,41 +12,34 @@ var friendData = require("../data/friends");
 // ===============================================================================
 
 module.exports = function(app) {
-  // API GET Requests
-  // Below code handles when users "visit" a page.
-  // In each of the below cases when a user visits a link
-  // (ex: localhost:PORT/api/admin... they are shown a JSON of the data in the table)
-  // ---------------------------------------------------------------------------
-
   app.get("/api/friends", function(req, res) {
     res.json(friendData);
   });
 
-  // API POST Requests
-  // Below code handles when a user submits a form and thus submits data to the server.
-  // In each of the below cases, when a user submits form data (a JSON object)
-  // ...the JSON is pushed to the appropriate JavaScript array
-  // (ex. User fills out a reservation request... this data is then sent to the server...
-  // Then the server saves the data to the tableData array)
-  // ---------------------------------------------------------------------------
+  
 
   app.post("/api/friends", function(req, res) {
-    // Note the code here. Our "server" will respond to requests and let users know if they have a table or not.
-    // It will do this by sending out the value "true" have a table
-    // req.body is available since we're using the body-parser middleware
+    // This is where I attempted to send back the "best match"
     friendData.push(req.body);
-    res.json(true);
+    postScore = req.body.scores.reduce(function(acc, val) { return parseInt(acc) + parseInt(val); });
+    differences = [];
+    // loop through array, log differences between the currently posted score and the scores that are already in the friends array.
+    for (i in friendArray) {// "friend" is a number the index basically
+        differences.push(Math.abs(friendArray[i].scores.reduce(function(acc, val) { return parseInt(acc) + parseInt(val); }) - postScore)) // this gives me an array of values for the current listed values.
+    };
+    console.log(differences);
+    // now, I need to return the name of the friend that has the lowest difference.
+    for (i in differences) {
+        if (differences[i] === 0) {
+            index = i;
+            return;
+        } else if (differences[i] === 1) {
+            index = i;
+            return;
+        } /// etc, didn't get to figure out a clean algorithm. 
+    }
+    
+    res.send(friendData[index]); // sends all data for best match
+
   });
-
-  // ---------------------------------------------------------------------------
-  // I added this below code so you could clear out the table while working with the functionality.
-  // Don"t worry about it!
-
-  /* app.post("/api/clear", function() {
-    // Empty out the arrays of data
-    tableData = [];
-    waitListData = [];
-
-    console.log(tableData);
-  }); */
 };
